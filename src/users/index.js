@@ -16,8 +16,8 @@ usersRouter.post("/", async (req, res, next) => {
 
 usersRouter.get("/", async (req, res, next) => {
   try {
-    const resources = await UsersModel.find({})
-    res.send(resources)
+    const users = await UsersModel.find({})
+    res.send(users)
   } catch (error) {
     next(error)
   }
@@ -25,9 +25,9 @@ usersRouter.get("/", async (req, res, next) => {
 
 usersRouter.get("/:id", async (req, res, next) => {
   try {
-    const resource = await UsersModel.findById(req.params.id)
-    if (resource) {
-      res.send(resource)
+    const user = await UsersModel.findById(req.params.id)
+    if (user) {
+      res.send(user)
     } else {
       next(createError(404, `User with id ${req.params.id} not found!`))
     }

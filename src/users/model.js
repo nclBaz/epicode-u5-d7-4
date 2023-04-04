@@ -28,4 +28,16 @@ UsersSchema.pre("save", async function () {
   }
 })
 
+UsersSchema.methods.toJSON = function () {
+  // This .toJSON method is called EVERY TIME Express does a res.send(user/users)
+  // This does mean that we could override the default behaviour of this method, by writing some code that removes passwords (and also some unnecessary things as well) from users
+  const currentUserDocument = this
+  const currentUser = currentUserDocument.toObject()
+  delete currentUser.password
+  delete currentUser.createdAt
+  delete currentUser.updatedAt
+  delete currentUser.__v
+  return currentUser
+}
+
 export default model("user", UsersSchema)
