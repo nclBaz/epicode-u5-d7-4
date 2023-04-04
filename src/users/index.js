@@ -16,7 +16,7 @@ usersRouter.post("/", async (req, res, next) => {
 
 usersRouter.get("/", async (req, res, next) => {
   try {
-    const resources = await UsersModel.find()
+    const resources = await UsersModel.find({})
     res.send(resources)
   } catch (error) {
     next(error)
