@@ -1,6 +1,7 @@
 import express from "express"
 import createError from "http-errors"
 import UsersModel from "./model.js"
+import { basicAuthMiddleware } from "../lib/auth/basic.js"
 
 const usersRouter = express.Router()
 
@@ -14,7 +15,7 @@ usersRouter.post("/", async (req, res, next) => {
   }
 })
 
-usersRouter.get("/", async (req, res, next) => {
+usersRouter.get("/", basicAuthMiddleware, async (req, res, next) => {
   try {
     const users = await UsersModel.find({})
     res.send(users)
@@ -23,7 +24,7 @@ usersRouter.get("/", async (req, res, next) => {
   }
 })
 
-usersRouter.get("/:id", async (req, res, next) => {
+usersRouter.get("/:id", basicAuthMiddleware, async (req, res, next) => {
   try {
     const user = await UsersModel.findById(req.params.id)
     if (user) {
@@ -36,7 +37,7 @@ usersRouter.get("/:id", async (req, res, next) => {
   }
 })
 
-usersRouter.put("/:id", async (req, res, next) => {
+usersRouter.put("/:id", basicAuthMiddleware, async (req, res, next) => {
   try {
     const updatedResource = await UsersModel.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
     if (updatedResource) {
@@ -49,7 +50,7 @@ usersRouter.put("/:id", async (req, res, next) => {
   }
 })
 
-usersRouter.delete("/:id", async (req, res, next) => {
+usersRouter.delete("/:id", basicAuthMiddleware, async (req, res, next) => {
   try {
     const deletedResource = await UsersModel.findByIdAndDelete(req.params.id)
     if (deletedResource) {
