@@ -2,6 +2,7 @@ import express from "express"
 import createError from "http-errors"
 import UsersModel from "./model.js"
 import { basicAuthMiddleware } from "../lib/auth/basic.js"
+import { adminOnlyMiddleware } from "../lib/auth/admin.js"
 
 const usersRouter = express.Router()
 
@@ -15,10 +16,36 @@ usersRouter.post("/", async (req, res, next) => {
   }
 })
 
-usersRouter.get("/", basicAuthMiddleware, async (req, res, next) => {
+usersRouter.get("/", basicAuthMiddleware, adminOnlyMiddleware, async (req, res, next) => {
   try {
     const users = await UsersModel.find({})
     res.send(users)
+  } catch (error) {
+    next(error)
+  }
+})
+
+usersRouter.get("/me", basicAuthMiddleware, async (req, res, next) => {
+  try {
+    res.send(req.user)
+  } catch (error) {
+    next(error)
+  }
+})
+
+usersRouter.put("/me", basicAuthMiddleware, async (req, res, next) => {
+  try {
+    const updatedUser = await UsersModel.findByIdAndUpdate(req.user._id, req.body, { new: true, runValidators: true })
+    res.send(updatedUser)
+  } catch (error) {
+    next(error)
+  }
+})
+
+usersRouter.delete("/me", basicAuthMiddleware, async (req, res, next) => {
+  try {
+    await UsersModel.findOneAndDelete(req.user._id)
+    res.status(204).send()
   } catch (error) {
     next(error)
   }
@@ -37,7 +64,7 @@ usersRouter.get("/:id", basicAuthMiddleware, async (req, res, next) => {
   }
 })
 
-usersRouter.put("/:id", basicAuthMiddleware, async (req, res, next) => {
+usersRouter.put("/:id", basicAuthMiddleware, adminOnlyMiddleware, async (req, res, next) => {
   try {
     const updatedResource = await UsersModel.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
     if (updatedResource) {
@@ -50,7 +77,7 @@ usersRouter.put("/:id", basicAuthMiddleware, async (req, res, next) => {
   }
 })
 
-usersRouter.delete("/:id", basicAuthMiddleware, async (req, res, next) => {
+usersRouter.delete("/:id", basicAuthMiddleware, adminOnlyMiddleware, async (req, res, next) => {
   try {
     const deletedResource = await UsersModel.findByIdAndDelete(req.params.id)
     if (deletedResource) {

@@ -24,6 +24,7 @@ export const basicAuthMiddleware = async (req, res, next) => {
 
     if (user) {
       // 5.a If credentials are ok --> you can go on (next)
+      req.user = user
       next()
     } else {
       // 5.b If credentials are NOT ok --> 401
